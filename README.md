@@ -26,15 +26,14 @@ This is a Machine Learning Project that predicts the cricket score based on inpu
 
 ## Create a virtual environment and activate it:
 
-bash
-Copy code
+ ```bash
 python -m venv venv
 source venv/bin/activate
 
 ## install required packages:
-flask
-sci-kit learn
-pandas
+flask,
+sci-kit learn,
+pandas,
 etc.
 
 ## Customization
