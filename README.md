@@ -15,6 +15,7 @@ This is a Machine Learning Project that predicts the cricket score based on inpu
 - JavaScript (jQuery)
 - Flask (for backend logic)
 - Python (for prediction logic)
+- Jupyter Notebook (for training the model)
 
 ## Setup Instructions
 
@@ -24,18 +25,15 @@ This is a Machine Learning Project that predicts the cricket score based on inpu
    git clone https://github.com/yourusername/cricket-score-predictor.git
    cd cricket-score-predictor
    ```
-2. Create a virtual environment and activate it:
 
- ```bash
-python -m venv venv
-source venv/bin/activate
-```
-
-3. Install required packages:
+2. Install required packages:
 flask,
 sci-kit learn,
 pandas,
 etc.
+
+3. Run app.py
+
 
 ## Customization
 To add more teams or cities, update the dropdown options in the index.html file.
