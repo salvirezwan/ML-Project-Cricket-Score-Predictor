@@ -1,0 +1,568 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Cricket Score Predictor</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+            background-image: url('static/images/istockphoto-1265144970-1024x1024_cleanup.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            font-family: "Ubuntu", sans-serif;
+            color: #5badff
+        }
+        .container {
+            max-width: 1200px;
+        }
+        h1 {
+            margin-bottom: 30px;
+            /* color: #103375; */
+            color: #e77d9f
+
+        }
+        .team-image {
+            width: 100px;
+            height: 100px;
+        }
+        .col-md-8 {
+            -ms-flex: 0 0 66.666667%;
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+            border: 4px solid bisque;
+            border-width: 13px;
+            border-radius: 13px;
+            position: relative;
+            top: 19px;
+        }
+        input[type="number"], select {
+            background-color: white;
+            transition: background-color 0.3s ease;
+        }
+        input[type="number"]:hover, select:hover {
+            background-color: lightgrey;
+        }
+    </style>
+    <script>
+        function updateTeamImage(team, elementId) {
+            const imgElement = document.getElementById(elementId);
+            if (team) {
+                imgElement.src = `/static/images/${team.toLowerCase().replace(' ', '_')}.png`;
+                imgElement.alt = team;
+            } else {
+                imgElement.src = '';
+                imgElement.alt = '';
+            }
+        }
+
+        $(document).ready(function() {
+            // Initialize default images
+            updateTeamImage('Bangladesh', 'batting_team_image');
+            updateTeamImage('Sri Lanka', 'bowling_team_image');
+
+            // Update images on team selection change
+            $('#batting_team').change(function() {
+                updateTeamImage(this.value, 'batting_team_image');
+            });
+            $('#bowling_team').change(function() {
+                updateTeamImage(this.value, 'bowling_team_image');
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <img id="batting_team_image" class="team-image" src="" alt="Batting Team">
+            </div>
+
+            <div class="col-md-8">
+                <h1><b>Cricket Score Predictor</b></h1>
+                <form method="POST">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="batting_team"><b>Select batting team</b></label>
+                            <select class="form-control" name="batting_team" id="batting_team">
+                                <option value=""><b>Select Team</b></option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if team == 'Bangladesh' %}selected{% endif %}><b>{{ team }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="bowling_team"><b>Select bowling team</b></label>
+                            <select class="form-control" name="bowling_team" id="bowling_team">
+                                <option value=""><b>Select Team</b></option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if team == 'Sri Lanka' %}selected{% endif %}><b>{{ team }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="city"><b>Select city</b></label>
+                            <select class="form-control" name="city" id="city">
+                                {% for city in cities %}
+                                <option value="{{ city }}" {% if city == 'Mirpur' %}selected{% endif %}><b>{{ city }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="current_score"><b>Current Score</b></label>
+                            <input type="number" class="form-control" name="current_score" id="current_score">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="overs"><b>Overs Bowled (over > 5)</b></label>
+                            <input type="number" step="0.1" class="form-control" name="overs" id="overs">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="wickets"><b>Wickets Out</b></label>
+                            <input type="number" class="form-control" name="wickets" id="wickets">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="last_five"><b>Runs in last 5 overs</b></label>
+                            <input type="number" class="form-control" name="last_five" id="last_five">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block"><b>Predict Score</b></button>
+                </form>
+
+                {% if prediction %}
+                <div class="alert alert-info mt-4 text-center" role="alert">
+                    <h2><b>Predicted Score - {{ prediction }}</b></h2>
+                </div>\
+
+                {% endif %}
+            </div>
+
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <img id="bowling_team_image" class="team-image" src="" alt="Bowling Team">
+            </div>
+        </div>
+    </div>
+</body>
+</html> -->
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cricket Score Predictor</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+            background-image: url('static/images/istockphoto-1265144970-1024x1024_cleanup.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            font-family: "Ubuntu", sans-serif;
+            color: #5badff;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #e77d9f;
+        }
+        .team-image {
+            width: 100px;
+            height: 100px;
+        }
+        .col-md-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+            border: 4px solid bisque;
+            border-width: 13px;
+            border-radius: 13px;
+            position: relative;
+            top: 19px;
+        }
+        input[type="number"], select {
+            background-color: white;
+            transition: background-color 0.3s ease;
+        }
+        input[type="number"]:hover, select:hover {
+            background-color: lightgrey;
+        }
+        .error-message {
+            color: red;
+            font-size: 20px;
+        }
+    </style>
+    <script>
+        function updateTeamImage(team, elementId) {
+            const imgElement = document.getElementById(elementId);
+            if (team) {
+                imgElement.src = `/static/images/${team.toLowerCase().replace(' ', '_')}.png`;
+                imgElement.alt = team;
+            } else {
+                imgElement.src = '';
+                imgElement.alt = '';
+            }
+        }
+
+        function validateInputs() {
+            const battingTeam = document.getElementById('batting_team').value;
+            const bowlingTeam = document.getElementById('bowling_team').value;
+            const city = document.getElementById('city').value;
+            const currentScore = document.getElementById('current_score').value;
+            const oversBowled = document.getElementById('overs').value;
+            const wicketsOut = document.getElementById('wickets').value;
+            const runsLast5Overs = document.getElementById('last_five').value;
+
+            if (!battingTeam || !bowlingTeam || !city || !currentScore || !oversBowled || !wicketsOut || !runsLast5Overs ||
+                parseInt(currentScore) > 300 || parseFloat(oversBowled) < 5 || parseFloat(oversBowled) > 19.5 ||
+                parseInt(wicketsOut) < 0 || parseInt(wicketsOut) > 9 || parseInt(runsLast5Overs) > 125 || parseInt(runsLast5Overs) > parseInt(currentScore)) {
+                document.getElementById('errorMessage').innerText = "Invalid input";
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+                return false;
+            }
+            return true;
+        }
+
+
+
+        $(document).ready(function() {
+            updateTeamImage('Bangladesh', 'batting_team_image');
+            updateTeamImage('Sri Lanka', 'bowling_team_image');
+
+            $('#batting_team').change(function() {
+                updateTeamImage(this.value, 'batting_team_image');
+            });
+            $('#bowling_team').change(function() {
+                updateTeamImage(this.value, 'bowling_team_image');
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <img id="batting_team_image" class="team-image" src="" alt="Batting Team">
+            </div>
+
+            <div class="col-md-8">
+                <h1><b>Cricket Score Predictor</b></h1>
+                <form method="POST" onsubmit="return validateInputs()">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="batting_team"><b>Select batting team</b></label>
+                            <select class="form-control" name="batting_team" id="batting_team">
+                                <option value=""><b>Select Team</b></option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if team == 'Bangladesh' %}selected{% endif %}><b>{{ team }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="bowling_team"><b>Select bowling team</b></label>
+                            <select class="form-control" name="bowling_team" id="bowling_team">
+                                <option value=""><b>Select Team</b></option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if team == 'Sri Lanka' %}selected{% endif %}><b>{{ team }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="city"><b>Select city</b></label>
+                            <select class="form-control" name="city" id="city">
+                                {% for city in cities %}
+                                <option value="{{ city }}" {% if city == 'Mirpur' %}selected{% endif %}><b>{{ city }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="current_score"><b>Current Score</b></label>
+                            <input type="number" class="form-control" name="current_score" id="current_score">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="overs"><b>Overs Bowled (over > 5)</b></label>
+                            <input type="number" step="0.1" class="form-control" name="overs" id="overs">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="wickets"><b>Wickets Out</b></label>
+                            <input type="number" class="form-control" name="wickets" id="wickets">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="last_five"><b>Runs in last 5 overs</b></label>
+                            <input type="number" class="form-control" name="last_five" id="last_five">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block"><b>Predict Score</b></button>
+                </form>
+
+                <p id="errorMessage" class="error-message"></p>
+
+                {% if prediction %}
+                <div class="alert alert-info mt-4 text-center" role="alert">
+                    <h2><b>Predicted Score - {{ prediction }}</b></h2>
+                </div>
+                {% endif %}
+            </div>
+    
+
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <img id="bowling_team_image" class="team-image" src="" alt="Bowling Team">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Cricket Score Predictor</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+            background-image: url('static/images/istockphoto-1265144970-1024x1024_cleanup.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            font-family: "Ubuntu", sans-serif;
+            color: #5badff;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #e77d9f;
+        }
+        .team-image {
+            width: 100px;
+            height: 100px;
+        }
+        .col-md-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+            border: 4px solid bisque;
+            border-width: 13px;
+            border-radius: 13px;
+            position: relative;
+            top: 19px;
+        }
+        input[type="number"], select {
+            background-color: white;
+            transition: background-color 0.3s ease;
+        }
+        input[type="number"]:hover, select:hover {
+            background-color: lightgrey;
+        }
+        .error-message {
+            color: red;
+            font-size: 20px;
+        }
+    </style>
+    <script>
+        function updateTeamImage(team, elementId) {
+            const imgElement = document.getElementById(elementId);
+            if (team) {
+                imgElement.src = `/static/images/${team.toLowerCase().replace(' ', '_')}.png`;
+                imgElement.alt = team;
+            } else {
+                imgElement.src = '';
+                imgElement.alt = '';
+            }
+        }
+
+        function validateInputs() {
+            const battingTeam = document.getElementById('batting_team').value;
+            const bowlingTeam = document.getElementById('bowling_team').value;
+            const city = document.getElementById('city').value;
+            const currentScore = document.getElementById('current_score').value;
+            const oversBowled = document.getElementById('overs').value;
+            const wicketsOut = document.getElementById('wickets').value;
+            const runsLast5Overs = document.getElementById('last_five').value;
+
+            if (!battingTeam || !bowlingTeam || !city || !currentScore || !oversBowled || !wicketsOut || !runsLast5Overs ||
+                parseInt(currentScore) > 300 || parseFloat(oversBowled) < 5 || parseFloat(oversBowled) > 19.5 ||
+                parseInt(wicketsOut) < 0 || parseInt(wicketsOut) > 9 || parseInt(runsLast5Overs) > 125 || parseInt(runsLast5Overs) > parseInt(currentScore)) {
+                document.getElementById('errorMessage').innerText = "Invalid input";
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function() {
+            updateTeamImage('Bangladesh', 'batting_team_image');
+            updateTeamImage('Sri Lanka', 'bowling_team_image');
+
+            $('#batting_team').change(function() {
+                updateTeamImage(this.value, 'batting_team_image');
+            });
+            $('#bowling_team').change(function() {
+                updateTeamImage(this.value, 'bowling_team_image');
+            });
+
+            if ($('#prediction').length) {
+                setTimeout(() => {
+                    // Reset the form fields
+                    $('#batting_team').val('Bangladesh');
+                    $('#bowling_team').val('Sri Lanka');
+                    $('#city').val('Mirpur');
+                    $('#current_score').val('');
+                    $('#overs').val('');
+                    $('#wickets').val('');
+                    $('#last_five').val('');
+
+                    // Update images
+                    updateTeamImage('Bangladesh', 'batting_team_image');
+                    updateTeamImage('Sri Lanka', 'bowling_team_image');
+
+                    // Remove the prediction alert
+                    $('.alert-info').remove();
+                }, 4000);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <img id="batting_team_image" class="team-image" src="" alt="Batting Team">
+            </div>
+
+            <div class="col-md-8">
+                <h1><b>Cricket Score Predictor</b></h1>
+                <form method="POST" onsubmit="return validateInputs()">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="batting_team"><b>Select batting team</b></label>
+                            <select class="form-control" name="batting_team" id="batting_team">
+                                <option value=""><b>Select Team</b></option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if team == 'Bangladesh' %}selected{% endif %}><b>{{ team }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="bowling_team"><b>Select bowling team</b></label>
+                            <select class="form-control" name="bowling_team" id="bowling_team">
+                                <option value=""><b>Select Team</b></option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if team == 'Sri Lanka' %}selected{% endif %}><b>{{ team }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="city"><b>Select city</b></label>
+                            <select class="form-control" name="city" id="city">
+                                {% for city in cities %}
+                                <option value="{{ city }}" {% if city == 'Mirpur' %}selected{% endif %}><b>{{ city }}</b></option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="current_score"><b>Current Score</b></label>
+                            <input type="number" class="form-control" name="current_score" id="current_score" value="{{ request.form.current_score }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="overs"><b>Overs Bowled (over > 5)</b></label>
+                            <input type="number" step="0.1" class="form-control" name="overs" id="overs" value="{{ request.form.overs }}">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="wickets"><b>Wickets Out</b></label>
+                            <input type="number" class="form-control" name="wickets" id="wickets" value="{{ request.form.wickets }}">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="last_five"><b>Runs in last 5 overs</b></label>
+                            <input type="number" class="form-control" name="last_five" id="last_five" value="{{ request.form.last_five }}">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block"><b>Predict Score</b></button>
+                </form>
+
+                <p id="errorMessage" class="error-message"></p>
+
+                {% if prediction %}
+                <div class="alert alert-info mt-4 text-center" role="alert">
+                    <h2 id="prediction"><b>Predicted Score - {{ prediction }}</b></h2>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <img id="bowling_team_image" class="team-image" src="" alt="Bowling Team">
+            </div>
+        </div>
+    </div>
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+
+
