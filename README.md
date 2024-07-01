@@ -24,14 +24,14 @@ This is a Machine Learning Project that predicts the cricket score based on inpu
    git clone https://github.com/yourusername/cricket-score-predictor.git
    cd cricket-score-predictor
    ```
-## Create a virtual environment and activate it:
+2. Create a virtual environment and activate it:
 
  ```bash
 python -m venv venv
 source venv/bin/activate
 ```
 
-## Install required packages:
+3. Install required packages:
 flask,
 sci-kit learn,
 pandas,
