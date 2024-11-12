@@ -1,6 +1,6 @@
 # Cricket Score Predictor
 
-This is a Machine Learning Project that predicts the cricket score based on input parameters such as batting team, bowling team, city, current score, overs bowled, wickets out, and runs in the last 5 overs.
+This is a Machine Learning Project that predicts the cricket score based on input parameters such as batting team, bowling team, city, current score, overs bowled, wickets out, and runs in the last 5 overs. I collaborated with my classmates Abeer and Rafin for this project.
 
 ## Features
 
