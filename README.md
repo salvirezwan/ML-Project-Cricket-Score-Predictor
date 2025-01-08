@@ -1,6 +1,6 @@
 # Cricket Score Predictor
 
-This is a Machine Learning Project that predicts the cricket score based on input parameters such as batting team, bowling team, city, current score, overs bowled, wickets out, and runs in the last 5 overs. I collaborated with my classmates Abeer and Rafin here. We have tried to modify and enhance further the project found in [KNOWLEDGE DOCTOR YouTube channel](https://youtu.be/2C_bUATI6EU?si=jkmffs_L9OgOfsuC)
+This is a Machine Learning Project that predicts the cricket score based on input parameters such as batting team, bowling team, city, current score, overs bowled, wickets out, and runs in the last 5 overs. I collaborated with my classmates Abeer and Rafin here. We have tried to modify and enhance further the project found in [KNOWLEDGE DOCTOR YouTube channel](https://youtu.be/2C_bUATI6EU?si=jkmffs_L9OgOfsuC). We altered the hyperparameters of Random Forest and XGBoost algorithms and compared the performances.
 
 ## Features
 
